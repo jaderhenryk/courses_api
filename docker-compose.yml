@@ -1,14 +1,36 @@
 version: "3.9"
 
 services:
-  postgres:
+  app:
+    container_name: courses_api
+    build:
+      context: .
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+    networks:
+      - courses_network
+    environment:
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+
+
+  db:
     container_name: courses_db
     image: bitnami/postgresql
     environment:
-      - POSTGRES_USER=docker
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=courses_api
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     volumes:
       - ./db:/var/lib/postgresql/data
     ports:
       - 5432:5432
+    networks:
+      - courses_network
+
+networks:
+  courses_network:
+    driver: bridge
